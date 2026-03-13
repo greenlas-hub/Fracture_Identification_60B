@@ -1,6 +1,7 @@
 clear; clc; close all;
 
-info = nrrdinfo("1533508883_5CORONAL-imageTypeDERIVED-PRIMARY-AXIAL-CT_SOM5SPO.nrrd");
+%% Loading the Data 
+info = nrrdinfo("1533508883_5CORONAL-imageTypeDERIVED-PRIMARY-AXIAL-CT_SOM5SPO.nrrd"); % Getting metadata
 A = info.SpatialMapping.A; % Performs voxel scaling & translation  
 spacing = [norm(A(1:3,1)),norm(A(1:3,2)),norm(A(1:3,3))];
 
@@ -21,4 +22,5 @@ intensitiesSmooth = imgaussfilt3(bone.Voxels,2);
 volshow(intensitiesSmooth,...
     'Alphamap','linear',...
     'Transformation',makehgtform('scale',spacing([2,1,3])));
+
 
