@@ -2,9 +2,9 @@ clear; clc; close all;
 
 file = input("nrrd File to analyze: ","s");
 
-boneViewer(file);
+Volume  = boneViewer(file);
 
-function boneViewer(file)
+function newV = boneViewer(file)
 info = nrrdinfo(file);
 A = info.SpatialMapping.A;
 spacing = [norm(A(1:3,1)),norm(A(1:3,2)),norm(A(1:3,3))];
