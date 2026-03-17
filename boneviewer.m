@@ -3,10 +3,11 @@ clear; clc; close all;
 file = input("nrrd File to analyze: ","s");
 
 % Load CT volume and compute voxel spacing 
-V = boneViewer(file);
+[ds.data ds.spacing] = boneViewer(file);
+ds.size = size(ds.data);
 
 % Let the user draw a fracture region on a selected slice 
-fractureMask = userDrawFractureRegion(V);
+fractureMask = userDrawFractureRegion(ds.data);
 
 fractureMask;
 
@@ -20,8 +21,6 @@ function [V, spacing] = boneViewer(file)
     transform = makehgtform('scale',spacing([2,1,3])); % create the transformation for each of the images to have the same custom spacing
 
     V = squeeze(double(nrrdread(file))); 
-
-    %sliceViewer(V);
 
     mask = (V >= 300) & (V <= 3000); % based on HU unit for bones in CT scans, adjusted for visibility 
     newV = zeros(size(V),'like',V); % creates newV with same spacing as V
