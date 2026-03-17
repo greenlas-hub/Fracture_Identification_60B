@@ -2,68 +2,71 @@ clear; clc; close all;
 
 file = input("nrrd File to analyze: ","s");
 
-V  = boneViewer(file);
+% Load CT volume and compute voxel spacing 
+V = boneViewer(file);
 
-fractureMask = userDrawFractureRegion(V);
+% Let the user draw a fracture region on a selected slice 
+fractureMask3D = userDrawFractureRegion(V);
 
-volshow(fractureMask, 'Alphamap','linear');
+% Visualize the 3D fracture mask 
+volshow(fractureMask3D, 'Alphamap','linear');
 
-fractureMask3D; 
+fractureMask3D;
 
 function [V, spacing] = boneViewer(file)
-info = nrrdinfo(file);
-A = info.SpatialMapping.A;
-spacing = [norm(A(1:3,1)),norm(A(1:3,2)),norm(A(1:3,3))];
-transform = makehgtform('scale',spacing([2,1,3])); % create the transformation for each of the images to have the same custom spacing
 
-V = squeeze(double(nrrdread(file)));
+    % Read NRRD and extract voxel spacing
+    info = nrrdinfo(file);
+    A = info.SpatialMapping.A;
+    spacing = [norm(A(1:3,1)),norm(A(1:3,2)),norm(A(1:3,3))];
 
-mask = (V >= 300) & (V <= 3000); % based on HU unit for bones in CT scans, adjusted for visibility
-newV = zeros(size(V),'like',V); % creates newV with same spacing as V
-newV(mask) = 1; % every voxel of bone is white
-volshow(newV,... 
+    transform = makehgtform('scale',spacing([2,1,3])); % create the transformation for each of the images to have the same custom spacing
+
+    V = squeeze(double(nrrdread(file))); 
+
+    %sliceViewer(V);
+
+    mask = (V >= 300) & (V <= 3000); % based on HU unit for bones in CT scans, adjusted for visibility 
+    newV = zeros(size(V),'like',V); % creates newV with same spacing as V
+    newV(mask) = 1; % every voxel of bone is white
+    volshow(newV,... 
         'Alphamap','linear', ...
         'Transformation',transform);
 
-intensitiesSmooth = imgaussfilt3(newV,2);
-volshow(intensitiesSmooth,...
-    'Alphamap','linear',...
-    'Transformation',transform);
+   % Smooth intensity visualization 
+    intensitiesSmooth = imgaussfilt3(V,2);
+    volshow(intensitiesSmooth,...
+         'Alphamap','linear',...
+        'Transformation',transform);
 end
 
 function fractureMask3D = userDrawFractureRegion(V)
 
+    % Display middle slice for ROI selection 
     figure;
+    sliceIndex = round(size(V,3)/2); % Choose central slice 
+    slice = V(:,:,sliceIndex);
 
-    sliceIndex = round(size(V,3)/2);
-    slice = V(:,:,sliceIndex); 
+    % Display slice with contrast normalization 
+    imshow(mat2gray(slice, double(prctile(slice(:), [5 95]))));
+    title("Draw fracture region");
 
+    % Let user draw a rectangular ROI on the slice 
+    h = drawrectangle('Color', 'r', 'LineWidth', 2); 
+    wait(h); % Wait until ROI is finalized 
 
-    imshow(mat2gray(slice, double(prctile(slice(:), [5 95])))); 
-    title("Draw fracture region (circle or freehand)");
+    % Convert the drawn ROI into a binary mask 
+    mask2D = createMask(h); 
 
-    disp("Choose ROI type:");
-    disp("1 = Circle");
-    disp("2 = Freehand");
-    roiType = input("Enter choice: ");
+    close(gcf); % Close ROI figure 
 
-    switch roiType
-        case 1
-            roi = drawcircle('Color','r','LineWidth',1.5);
-        case 2
-            roi = drawfreehand('Color','r','LineWidth',1.5);
-        otherwise
-            error("Invalid selection.");
-    end
-
-    % Convert ROI to 2-D mask
-    mask2D = roi.createMask();
-
-    % Expand to 3-D mask 
-    fractureMask3D = false(size(V));
+    % Insert 2D mask into a 3D volume 
+    fractureMask3D = false(size(V)); 
     fractureMask3D(:,:,sliceIndex) = mask2D;
-
-    figure;
-    imshow(mask2D);
-    title("Selected Fracture Mask (2D)");
+    
+    % Show selected 2D mask for confirmation
+    figure; 
+    imshow(mask2D); 
+    title("Selected Fracture Mask (2D)"); 
+    
 end
