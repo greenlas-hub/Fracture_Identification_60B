@@ -4,21 +4,19 @@ file = input("nrrd File to analyze: ","s");
 
 V  = boneViewer(file);
 
-sliceIndex = round(size(V,3)/2);
-fractureMask = userDrawFractureRegion(V, sliceIndex);
+fractureMask = userDrawFractureRegion(V);
 
 volshow(fractureMask, 'Alphamap','linear');
 
-boneViewer(file);
 fractureMask3D; 
 
-function newV = boneViewer(file)
+function [V, spacing] = boneViewer(file)
 info = nrrdinfo(file);
 A = info.SpatialMapping.A;
 spacing = [norm(A(1:3,1)),norm(A(1:3,2)),norm(A(1:3,3))];
 transform = makehgtform('scale',spacing([2,1,3])); % create the transformation for each of the images to have the same custom spacing
 
-V = nrrdread(file);
+V = squeeze(double(nrrdread(file)));
 
 mask = (V >= 300) & (V <= 3000); % based on HU unit for bones in CT scans, adjusted for visibility
 newV = zeros(size(V),'like',V); % creates newV with same spacing as V
@@ -33,12 +31,15 @@ volshow(intensitiesSmooth,...
     'Transformation',transform);
 end
 
-function fractureMask3D = userDrawFractureRegion(V, sliceIndex)
+function fractureMask3D = userDrawFractureRegion(V)
 
     figure;
-    imagesc(V(:,:,sliceIndex)); 
-    imshow(mat2gray(sliceIndex, double(prctile(sliceIndex(:), [5 95])))); 
-    axis image off;
+
+    sliceIndex = round(size(V,3)/2);
+    slice = V(:,:,sliceIndex); 
+
+
+    imshow(mat2gray(slice, double(prctile(slice(:), [5 95])))); 
     title("Draw fracture region (circle or freehand)");
 
     disp("Choose ROI type:");
