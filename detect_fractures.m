@@ -10,7 +10,7 @@ function results = detect_fractures(v, sp, roi, threshold)
     r2 = roi.rows(2);
     c1 = roi.cols(1);   
     c2 = roi.cols(2);
-    subV = V(r1:r2, c1:c2, :);
+    subV = v(r1:r2, c1:c2, :);
     numSlices = size(subV, 3);
     fprintf('ROI sub-volume: %d x %d x %d\n', size(subV,1), size(subV,2), numSlices);
 

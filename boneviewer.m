@@ -1,15 +1,22 @@
-clear; clc; close all;
+clear; clc; close all force;
 
-file = input("nrrd File to analyze: ","s");
+file = '3 FIRST RUN.nrrd';
 
 % Load CT volume and compute voxel spacing 
 [ds.data ds.spacing] = boneViewer(file);
 ds.size = size(ds.data);
 
 % Let the user draw a fracture region on a selected slice 
-fractureMask = userDrawFractureRegion(ds.data);
 
-fractureMask;
+roi = userDrawFractureRegion(ds.data);
+disp(roi)
+
+% run fracture detection on the selected region
+% 300 is the bone density threshold (based on HU ranges for cortical bone)
+results = detect_fractures(ds.data, ds.spacing, roi, 300);
+
+% show all the results: charts, slices, and 3D view
+show_results(ds, results);
 
 function [V, spacing] = boneViewer(file)
 
@@ -36,7 +43,7 @@ function [V, spacing] = boneViewer(file)
         'Transformation',transform);
 end
 
-function [fractureMask, roi] = userDrawFractureRegion(V)
+function roi = userDrawFractureRegion(V)
     
     % Display middle slice for ROI selection 
     figure;
@@ -68,8 +75,6 @@ function [fractureMask, roi] = userDrawFractureRegion(V)
         r1, r2, c1, c2, r2-r1+1, c2-c1+1);
 
     % Convert the drawn ROI into a binary mask 
-    fractureMask = createMask(h); 
-
     close(gcf); % Close ROI figure 
     
 end
