@@ -2,16 +2,12 @@ clear; clc; close all;
 
 file = input("nrrd File to analyze: ","s");
 
-Volume  = boneViewer(file);
-
-medVol = medicalVolume(file);
-V = single(medVol.Voxels);
+V  = boneViewer(file);
 
 sliceIndex = round(size(V,3)/2);
 fractureMask = userDrawFractureRegion(V, sliceIndex);
 
 volshow(fractureMask, 'Alphamap','linear');
-
 
 boneViewer(file);
 fractureMask3D; 
