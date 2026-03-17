@@ -19,7 +19,6 @@ function ds = nrrd_load(filepath)
     % pack into a struct
     ds.data    = V;
     ds.spacing = spacing;
-    ds.origin  = origin;
     ds.size    = size(V);
 
     fprintf('Loaded: %d x %d x %d   spacing: %.3f x %.3f x %.3f mm\n', ...
