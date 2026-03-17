@@ -64,5 +64,4 @@ function fractureMask3D = userDrawFractureRegion(V, sliceIndex)
     figure;
     imshow(mask2D);
     title("Selected Fracture Mask (2D)");
-
 end
