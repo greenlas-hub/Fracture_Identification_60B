@@ -2,9 +2,9 @@ function show_results(ds, results)
 % show_results  Display fracture detection results.
 %   Figure 3: full 3D volume with fracture in red
 
-    sp       = results.spacing;
+    sp = results.spacing;
     boneMask = results.boneMask;
-    roi      = results.roi;
+    roi = results.roi;
     % full 3D volume with fracture highlighted in red ---
     % we render two overlapping volumes in the same viewer:
     %   1) the whole scan in white/gray (bone colormap)
@@ -57,8 +57,8 @@ function show_results(ds, results)
     x = linspace(0, 1, 256)';
     amap = zeros(256, 1);
     rampStart = 0.15;
-    rampEnd   = 0.55;
-    rampMask  = x > rampStart;
+    rampEnd = 0.55;
+    rampMask = x > rampStart;
     amap(rampMask) = ((x(rampMask) - rampStart) / (rampEnd - rampStart)).^1.8;
     amap = min(amap, 0.85);
 
