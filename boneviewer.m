@@ -37,7 +37,8 @@ function fractureMask3D = userDrawFractureRegion(V, sliceIndex)
 
     figure;
     imagesc(V(:,:,sliceIndex)); 
-    colormap gray; axis image off;
+    imshow(mat2gray(sliceIndex, double(prctile(sliceIndex(:), [5 95])))); 
+    axis image off;
     title("Draw fracture region (circle or freehand)");
 
     disp("Choose ROI type:");
