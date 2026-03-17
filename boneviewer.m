@@ -4,6 +4,18 @@ file = input("nrrd File to analyze: ","s");
 
 Volume  = boneViewer(file);
 
+medVol = medicalVolume(file);
+V = single(medVol.Voxels);
+
+sliceIndex = round(size(V,3)/2);
+fractureMask = userDrawFractureRegion(V, sliceIndex);
+
+volshow(fractureMask, 'Alphamap','linear');
+
+
+boneViewer(file);
+fractureMask3D; 
+
 function newV = boneViewer(file)
 info = nrrdinfo(file);
 A = info.SpatialMapping.A;
@@ -24,4 +36,38 @@ intensitiesSmooth = imgaussfilt3(newV,2);
 volshow(intensitiesSmooth,...
     'Alphamap','linear',...
     'Transformation',transform);
+end
+
+function fractureMask3D = userDrawFractureRegion(V, sliceIndex)
+
+    figure;
+    imagesc(V(:,:,sliceIndex)); 
+    colormap gray; axis image off;
+    title("Draw fracture region (circle or freehand)");
+
+    disp("Choose ROI type:");
+    disp("1 = Circle");
+    disp("2 = Freehand");
+    roiType = input("Enter choice: ");
+
+    switch roiType
+        case 1
+            roi = drawcircle('Color','r','LineWidth',1.5);
+        case 2
+            roi = drawfreehand('Color','r','LineWidth',1.5);
+        otherwise
+            error("Invalid selection.");
+    end
+
+    % Convert ROI to 2-D mask
+    mask2D = roi.createMask();
+
+    % Expand to 3-D mask 
+    fractureMask3D = false(size(V));
+    fractureMask3D(:,:,sliceIndex) = mask2D;
+
+    figure;
+    imshow(mask2D);
+    title("Selected Fracture Mask (2D)");
+
 end
