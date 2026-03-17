@@ -1,4 +1,4 @@
-clear all; close all; clc;
+clear all; close all force; clc;
 
 % load the CT scan
 filePath = '3 FIRST RUN.nrrd';

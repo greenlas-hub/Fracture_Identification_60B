@@ -112,37 +112,9 @@ function results = detect_fractures(ds, roi, threshold)
             isHealthy(s) = true;  % this slice looks healthy
         end
     end
-
     % walk through and find the longest streak of healthy slices
-    bestStreakStart = 0;
-    bestStreakLen = 0;
-    currentStart = 0;
-    currentLen = 0;
-
-    for s = 1:numSlices
-        if isHealthy(s)
-            if currentLen == 0
-                currentStart = s;  % start a new streak
-            end
-            currentLen = currentLen + 1;  % extend the streak
-        else
-            % streak broke, check if it was the longest so far
-            if currentLen > bestStreakLen
-                bestStreakLen   = currentLen;
-                bestStreakStart = currentStart;
-            end
-            currentLen = 0;  % reset for next streak
-        end
-    end
-    % check the last streak in case it goes to the end
-    if currentLen > bestStreakLen
-        bestStreakLen = currentLen;
-        bestStreakStart = currentStart;
-    end
-
-    bestStreakEnd = bestStreakStart + bestStreakLen - 1;
-    fprintf('Healthy shaft: slices %d-%d (%d slices)\n', ...
-        bestStreakStart, bestStreakEnd, bestStreakLen);
+    [bestStreakStart, bestStreakLen, bestStreakEnd] = findLongestStreak(isHealthy);
+    fprintf('Healthy shaft: slices %d-%d (%d slices)\n', bestStreakStart, bestStreakEnd, bestStreakLen);
 
     % baseline solidity = median of the healthy shaft
     shaftSolidity = solidityArr(bestStreakStart:bestStreakEnd);
@@ -154,33 +126,8 @@ function results = detect_fractures(ds, roi, threshold)
     tempHealthy = isHealthy;
     tempHealthy(bestStreakStart:bestStreakEnd) = false;
 
-    % same streak-finding logic as before - MAKE INTO FUNCTION
-    secondStart = 0;
-    secondLen = 0;
-    currentStart = 0;
-    currentLen = 0;
-
-    for s = 1:numSlices
-        if tempHealthy(s)
-            if currentLen == 0
-                currentStart = s; % start a new streak
-            end
-            currentLen = currentLen + 1; % extend the streak
-        else
-            % streak broke, check if it was the longest so far
-            if currentLen > secondLen
-                secondLen   = currentLen;
-                secondStart = currentStart;
-            end
-            currentLen = 0; % reset for next streak
-        end
-    end
-    % check the last streak in case it goes to the end
-    if currentLen > secondLen
-        secondLen   = currentLen;
-        secondStart = currentStart;
-    end
-    secondEnd = secondStart + secondLen - 1;
+    % find the longest healthy streak on the other side of the fracture
+    [secondStart, secondLen, secondEnd] = findLongestStreak(tempHealthy);
 
     % the fracture should be between the two healthy streaks
     fractureSlices = [];
@@ -283,4 +230,39 @@ function results = detect_fractures(ds, roi, threshold)
     results.boneSlices     = boneSlices;
     results.isHealthy      = isHealthy;
     results.shaftRange     = [bestStreakStart, bestStreakEnd];
+end
+
+function [streakStart, streakLen, streakEnd] = findLongestStreak(healthyArr)
+% finds the longest consecutive run of true values in a logical array
+% returns the start index, length, and end index of that streak
+
+    streakStart = 0;
+    streakLen = 0;
+    currentStart = 0;
+    currentLen = 0;
+
+    for s = 1:length(healthyArr)
+        if healthyArr(s)
+            if currentLen == 0
+                currentStart = s;           % start a new streak
+            end
+            currentLen = currentLen + 1;    % extend the streak
+
+        else
+            % streak broke, check if it was the longest so far
+            if currentLen > streakLen
+                streakLen   = currentLen;
+                streakStart = currentStart;
+            end
+            currentLen = 0;                 % reset for next streak
+        end
+    end
+
+    % check the last streak in case it goes to the end of the array
+    if currentLen > streakLen
+        streakLen = currentLen;
+        streakStart = currentStart;
+    end
+
+    streakEnd = streakStart + streakLen - 1;
 end

@@ -4,7 +4,6 @@ function show_results(ds, results)
 
     sp       = results.spacing;
     boneMask = results.boneMask;
-    fracMask = results.fracMask;
     roi      = results.roi;
     % full 3D volume with fracture highlighted in red ---
     % we render two overlapping volumes in the same viewer:
