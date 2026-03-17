@@ -37,7 +37,7 @@ function [V, spacing] = boneViewer(file)
         'Transformation',transform);
 
    % Smooth intensity visualization 
-    intensitiesSmooth = imgaussfilt3(V,2);
+    intensitiesSmooth = imgaussfilt3(newV,2);
     volshow(intensitiesSmooth,...
          'Alphamap','linear',...
         'Transformation',transform);
