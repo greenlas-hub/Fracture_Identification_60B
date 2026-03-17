@@ -6,12 +6,9 @@ file = input("nrrd File to analyze: ","s");
 V = boneViewer(file);
 
 % Let the user draw a fracture region on a selected slice 
-fractureMask3D = userDrawFractureRegion(V);
+fractureMask = userDrawFractureRegion(V);
 
-% Visualize the 3D fracture mask 
-volshow(fractureMask3D, 'Alphamap','linear');
-
-fractureMask3D;
+fractureMask;
 
 function [V, spacing] = boneViewer(file)
 
@@ -40,8 +37,8 @@ function [V, spacing] = boneViewer(file)
         'Transformation',transform);
 end
 
-function fractureMask3D = userDrawFractureRegion(V)
-
+function [fractureMask, roi] = userDrawFractureRegion(V)
+    
     % Display middle slice for ROI selection 
     figure;
     sliceIndex = round(size(V,3)/2); % Choose central slice 
@@ -55,18 +52,25 @@ function fractureMask3D = userDrawFractureRegion(V)
     h = drawrectangle('Color', 'r', 'LineWidth', 2); 
     wait(h); % Wait until ROI is finalized 
 
+     pos = round(h.Position);
+    c1 = max(1, pos(1));
+    r1 = max(1, pos(2));
+    c2 = min(size(V, 2), pos(1) + pos(3));
+    r2 = min(size(V, 1), pos(2) + pos(4));
+
+    close(figure);
+
+    % pack into a struct
+    roi.rows   = [r1, r2];
+    roi.cols   = [c1, c2];
+    roi.slices = [1, size(V, 3)];
+
+    fprintf('ROI selected: rows %d-%d, cols %d-%d (%d x %d pixels)\n', ...
+        r1, r2, c1, c2, r2-r1+1, c2-c1+1);
+
     % Convert the drawn ROI into a binary mask 
-    mask2D = createMask(h); 
+    fractureMask = createMask(h); 
 
     close(gcf); % Close ROI figure 
-
-    % Insert 2D mask into a 3D volume 
-    fractureMask3D = false(size(V)); 
-    fractureMask3D(:,:,sliceIndex) = mask2D;
-    
-    % Show selected 2D mask for confirmation
-    figure; 
-    imshow(mask2D); 
-    title("Selected Fracture Mask (2D)"); 
     
 end
