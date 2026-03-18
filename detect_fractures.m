@@ -137,10 +137,10 @@ function results = detect_fractures(v, sp, roi, threshold)
         % figure out which streak comes first in the volume
         if bestStreakStart < secondStart
             gapStart = bestStreakEnd + 1;
-            gapEnd   = secondStart - 1;
+            gapEnd = secondStart - 1;
         else
             gapStart = secondEnd + 1;
-            gapEnd   = bestStreakStart - 1;
+            gapEnd = bestStreakStart - 1;
         end
 
         % mark slices in the gap as fracture if solidity dropped enough
@@ -216,17 +216,17 @@ function results = detect_fractures(v, sp, roi, threshold)
     results.subVolume = subV;
     results.boneMask = boneMask;
     results.fractureSlices = fractureSlices;
-    results.gapPerSlice    = gapPerSlice;
-    results.solidityArr    = solidityArr;
-    results.areaArr        = areaArr;
-    results.piecesArr      = piecesArr;
-    results.baseline       = baseline;
-    results.threshold      = threshold;
-    results.roi            = roi;
-    results.spacing        = sp;
-    results.boneSlices     = boneSlices;
-    results.isHealthy      = isHealthy;
-    results.shaftRange     = [bestStreakStart, bestStreakEnd];
+    results.gapPerSlice = gapPerSlice;
+    results.solidityArr = solidityArr;
+    results.areaArr = areaArr;
+    results.piecesArr = piecesArr;
+    results.baseline = baseline;
+    results.threshold = threshold;
+    results.roi = roi;
+    results.spacing = sp;
+    results.boneSlices = boneSlices;
+    results.isHealthy = isHealthy;
+    results.shaftRange = [bestStreakStart, bestStreakEnd];
 end
 
 function [streakStart, streakLen, streakEnd] = findLongestStreak(healthyArr)
