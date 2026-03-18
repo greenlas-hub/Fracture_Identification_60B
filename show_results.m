@@ -5,7 +5,7 @@ function show_results(ds, results)
     sp = results.spacing;
     boneMask = results.boneMask;
     roi = results.roi;
-    % full 3D volume with fracture highlighted in red ---
+    % full 3D volume with fracture highlighted in red
     % we render two overlapping volumes in the same viewer:
     %   1) the whole scan in white/gray (bone colormap)
     %   2) just the fractured bone in red
