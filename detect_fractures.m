@@ -213,8 +213,8 @@ function results = detect_fractures(v, sp, roi, threshold)
     end
 
     % pack everything into a struct so show_results can use it
-    results.subVolume      = subV;
-    results.boneMask       = boneMask;
+    results.subVolume = subV;
+    results.boneMask = boneMask;
     results.fractureSlices = fractureSlices;
     results.gapPerSlice    = gapPerSlice;
     results.solidityArr    = solidityArr;
