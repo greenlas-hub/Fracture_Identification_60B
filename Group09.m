@@ -52,7 +52,7 @@ function roi = userDrawFractureRegion(V)
     h = drawrectangle('Color', 'r', 'LineWidth', 2); 
     wait(h); % Wait until ROI is finalized 
 
-     pos = round(h.Position);
+    pos = round(h.Position);
     c1 = max(1, pos(1));
     r1 = max(1, pos(2));
     c2 = min(size(V, 2), pos(1) + pos(3));

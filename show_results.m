@@ -1,6 +1,6 @@
 function show_results(ds, results)
 % show_results  Display fracture detection results.
-%   Figure 3: full 3D volume with fracture in red
+% Figure 3: full 3D volume with fracture in red
 
     sp = results.spacing;
     boneMask = results.boneMask;
@@ -94,5 +94,5 @@ function show_results(ds, results)
         fprintf('Fracture highlighted: slices %d-%d\n', ...
             fracSlicesFull(1), fracSlicesFull(end));
     end
-    fprintf('Done.\n');
+    
 end
